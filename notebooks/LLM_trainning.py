@@ -79,20 +79,18 @@ messages = [format_example_for_training(datum['input'], datum['output'], system_
 # Load the tokenizer with proper configuration
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 
-# CRITICAL FIX: Ensure proper padding token configuration
 if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 if tokenizer.pad_token_id is None:
     tokenizer.pad_token_id = tokenizer.eos_token_id
 
-# FIX: Set padding side to left for generation
 tokenizer.padding_side = "left"
 
 # Prepare the dataset
 prompts = tokenizer.apply_chat_template(
     messages, 
     tokenize=False, 
-    add_generation_prompt=False  # FIX: Don't add generation prompt during training
+    add_generation_prompt=False 
 )
 
 IGNORE_TOKEN_ID = -100
@@ -182,11 +180,6 @@ training_args = TrainingArguments(
     remove_unused_columns=False,
     gradient_checkpointing=True,
     save_strategy="steps",
-    # Removed incompatible arguments:
-    # evaluation_strategy="no",  # REMOVED
-    # push_to_hub=False,  # REMOVED if not supported
-    # load_best_model_at_end=False,  # REMOVED
-    # report_to="none",  # REMOVED
 )
 
 # Initialize Trainer
