@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <title>OpsyedAI - Enhanced with Memory</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #b2ebf2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      width: 450px;
+      max-height: 90vh;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      color: #00796b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .memory-indicator {
+      background: #4caf50;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    .conversation-info {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+      padding: 5px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    #chatbox {
+      flex: 1;
+      border-radius: 10px;
+      padding: 10px;
+      overflow-y: auto;
+      background: #e3f2fd;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .message {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      position: relative;
+      word-wrap: break-word;
+      font-size: 14px;
+      line-height: 1.4;
+      display: inline-block;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #b2dfdb;
+      color: #004d40;
+      border-bottom-left-radius: 4px;
+    }
+
+    .bot.memory-used {
+      background: #c8e6c9;
+      border-left: 3px solid #4caf50;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #bbdefb;
+      color: #0d47a1;
+      border-bottom-right-radius: 4px;
+      text-align: right;
+    }
+
+    .message-info {
+      font-size: 10px;
+      color: #666;
+      margin-top: 2px;
+      opacity: 0.7;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #90caf9;
+      border-radius: 20px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button {
+      padding: 10px 16px;
+      background-color: #29b6f6;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #0288d1;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      justify-content: center;
+    }
+
+    .control-btn {
+      padding: 6px 12px;
+      background-color: #757575;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .control-btn:hover {
+      background-color: #424242;
+    }
+
+    .rating-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #f1f8e9;
+      padding: 10px;
+      border-radius: 10px;
+      margin-top: 10px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .rating-label {
+      font-weight: bold;
+      font-size: 14px;
+      color: #33691e;
+    }
+
+    .bubbles-wrapper {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rating-bubble {
+      width: 30px;
+      height: 30px;
+      background-color: #e0e0e0;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s ease;
+    }
+
+    .rating-bubble:hover {
+      background-color: #81d4fa;
+    }
+
+    .rating-bubble.selected {
+      background-color: #29b6f6;
+      color: white;
+    }
+
+    .rating-bubble.disabled {
+      background-color: #cfd8dc !important;
+      color: #757575;
+    }
+
+    .rating-submit-btn {
+      background-color: #66bb6a;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .rating-submit-btn:hover:not(:disabled) {
+      background-color: #43a047;
+    }
+
+    .rating-submit-btn:disabled {
+      background-color: #c8e6c9;
+      color: #8e8e8e;
+      cursor: default;
+    }
+
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>
+      OpsyedAI 
+      <span class="memory-indicator">🧠 Memory</span>
+    </h1>
+    
+    <div class="conversation-info" id="conversationInfo">
+      🆕 New conversation started • Memory active
+    </div>
+
+    <div class="controls-row">
+      <button class="control-btn" onclick="startNewConversation()">🆕 New Chat</button>
+      <button class="control-btn" onclick="showHistory()">📚 History</button>
+      <button class="control-btn" onclick="toggleMemory()">🧠 Memory: <span id="memoryStatus">ON</span></button>
+    </div>
+
+    <div id="chatbox"></div>
+    
+    <div class="input-row">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Πληκτρολογήστε το μήνυμά σας..." 
+        onkeydown="if (event.key === 'Enter') sendMessage()" 
+      />
+      <button onclick="sendMessage()">Αποστολή</button>
+    </div>
+  </div>
+
+  <script>
+    const chatbox = document.getElementById("chatbox");
+    
+    // Enhanced memory variables
+    let conversationId = generateUUID();
+    let memoryEnabled = true;
+    let messageCount = 0;
+
+    function generateUUID() {
+      return crypto.randomUUID();
+    }
+
+    function updateConversationInfo() {
+      const info = document.getElementById("conversationInfo");
+      const status = memoryEnabled ? "Memory active" : "Memory disabled";
+      const convId = conversationId.substring(0, 8);
+      info.innerHTML = `💬 Conversation: ${convId}... • ${messageCount} messages • ${status}`;
+    }
+
+    function startNewConversation() {
+      conversationId = generateUUID();
+      messageCount = 0;
+      chatbox.innerHTML = '';
+      updateConversationInfo();
+      addMessage("Καλησπέρα, είμαι το OpsyedAI με ενεργή μνήμη συνομιλίας! Μπορώ να θυμάμαι την προηγούμενη συζήτησή μας.", "bot");
+    }
+
+    function toggleMemory() {
+      memoryEnabled = !memoryEnabled;
+      document.getElementById("memoryStatus").textContent = memoryEnabled ? "ON" : "OFF";
+      updateConversationInfo();
+      
+      const statusMsg = memoryEnabled ? 
+        "🧠 Μνήμη ενεργοποιήθηκε! Θα θυμάμαι την συνομιλία μας." : 
+        "💭 Μνήμη απενεργοποιήθηκε. Κάθε μήνυμα θα αντιμετωπίζεται ανεξάρτητα.";
+      addMessage(statusMsg, "bot");
+    }
+
+    function showHistory() {
+      fetch(`http://127.0.0.1:5000/conversation/${conversationId}`, {
+        method: "GET",
+        headers: {
+          'OpsyedAI_token': 'CDwpQyhoM7HYpx4SvDYI'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const exchanges = data.exchanges || [];
+        const historyMsg = `📚 Ιστορικό συνομιλίας: ${exchanges.length} ανταλλαγές στη μνήμη`;
+        addMessage(historyMsg, "bot");
+      })
+      .catch(error => {
+        console.error("History fetch error:", error);
+        addMessage("❌ Δεν μπόρεσα να ανακτήσω το ιστορικό.", "bot");
+      });
+    }
+
+    window.onload = function () {
+      updateConversationInfo();
+      addMessage("Καλησπέρα, είμαι το OpsyedAI με ενεργή μνήμη συνομιλίας! Μπορώ να θυμάμαι την προηγούμενη συζήτησή μας.", "bot");
+    };
+
+    function addMessage(text, sender, responseId = null, memoryUsed = false) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "message-wrapper";
+
+      const msg = document.createElement("div");
+      msg.className = "message " + sender + (memoryUsed ? " memory-used" : "");
+      msg.innerText = text;
+
+      if (responseId) {
+        wrapper.dataset.responseId = responseId;
+      }
+
+      // Add memory indicator for bot messages that used context
+      if (sender === "bot" && memoryUsed) {
+        const memoryInfo = document.createElement("div");
+        memoryInfo.className = "message-info";
+        memoryInfo.textContent = "🧠 Χρησιμοποίησα τη μνήμη συνομιλίας";
+        wrapper.appendChild(memoryInfo);
+      }
+
+      wrapper.appendChild(msg);
+      chatbox.appendChild(wrapper);
+      chatbox.scrollTop = chatbox.scrollHeight;
+
+      return wrapper;
+    }
+
+    function createRatingBubbles(targetWrapper, responseId) {
+      const container = document.createElement("div");
+      container.className = "rating-container";
+
+      const label = document.createElement("div");
+      label.className = "rating-label";
+      label.innerText = "Βαθμολογήστε την απάντηση";
+      container.appendChild(label);
+
+      const bubblesWrapper = document.createElement("div");
+      bubblesWrapper.className = "bubbles-wrapper";
+
+      let selectedRating = null;
+
+      for (let i = 1; i <= 5; i++) {
+        const bubble = document.createElement("div");
+        bubble.className = "rating-bubble";
+        bubble.innerText = i;
+
+        bubble.onclick = () => {
+          selectedRating = i;
+          bubblesWrapper.querySelectorAll(".rating-bubble").forEach(b => b.classList.remove("selected"));
+          bubble.classList.add("selected");
+        };
+
+        bubblesWrapper.appendChild(bubble);
+      }
+
+      container.appendChild(bubblesWrapper);
+
+      const submitBtn = document.createElement("button");
+      submitBtn.innerText = "Αποστολή";
+      submitBtn.className = "rating-submit-btn";
+
+      submitBtn.onclick = () => {
+        if (selectedRating === null) return;
+
+        fetch("http://127.0.0.1:5000/submit_rating", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            'OpsyedAI_token': 'CDwpQyhoM7HYpx4SvDYI'
+          },
+          body: JSON.stringify({
+            rating: selectedRating,
+            response_id: responseId
+          })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("Failed to submit rating");
+          return response.json();
+        })
+        .then(data => {
+          console.log("Rating submitted successfully:", data);
+        })
+        .catch(error => {
+          console.error("Rating submission error:", error);
+        });
+
+        container.remove();
+      };
+
+      container.appendChild(submitBtn);
+      targetWrapper.appendChild(container);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, "user");
+      input.value = "";
+      messageCount++;
+      updateConversationInfo();
+
+      const responseId = generateUUID();
+
+      // Enhanced request with conversation memory
+      const requestBody = { 
+        prompt: message,
+        response_id: responseId,
+        conversation_id: conversationId,
+        include_history: memoryEnabled
+      };
+
+      fetch("http://127.0.0.1:5000/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'OpsyedAI_token': 'CDwpQyhoM7HYpx4SvDYI'
+        },
+        body: JSON.stringify(requestBody)
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("Response data:", data); // Debug info
+          
+          const memoryUsed = data.context_used || false;
+          const responseWrapper = addMessage(data.generated_text, "bot", responseId, memoryUsed);
+
+          messageCount++;
+          updateConversationInfo();
+
+          // Show rating bubbles if QnA was retrieved
+          if (data.is_qna_retrieved === true) {
+            createRatingBubbles(responseWrapper, responseId);
+          }
+
+          // Log memory usage for debugging
+          if (memoryUsed) {
+            console.log("🧠 Memory was used for this response");
+            console.log("History length:", data.history_length || 0);
+            console.log("Relevance score:", data.relevance_score || 0);
+          }
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          addMessage("Σφάλμα: Αποτυχία επικοινωνίας με το διακομιστή.", "bot");
+        });
+    }
+  </script>
+</body>
+</html>
