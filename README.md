@@ -39,7 +39,7 @@ pdf_index, pdf_model, _ = build_pdf_sklearn_index(chunks, pdf_model_name)
 
 <summary><strong style="font-size: 2em;">Τρέξιμο ChatBot</strong></summary>
 Για να τρέξουμε το OpsyedAI chatbot με μνημη συνομιλίας πρέπει να τρέξουμε το αρχείο <a href=host_model.py>host_model.py</a> το οποίο αρχικοποιεί το μοντέλο και σηκώνει ένα API (FastAPI) για τη διεκπαιρέωση αιτημάτων στη συνάρτηση 'generate'. Ξεκινάμε έναν απλό web server στον υπολογιστή μας (python3 -m http.server 8080
-) που χρησιμοποιεί τη θύρα 8080 (port 8080) και εξυπηρετεί αρχεία από τον φάκελο όπου τρέχουμε την εντολή. Μπορούμε μετά να ανοίξουμε σε ένα browser το αρχείο <a href=chatbot_with_memory.html>chatbot_with_memory.html</a> [[http://localhost:8080/chatbot_with_memory.html]]  ώστε να κάνουμε αιτήματα στο API μέσω του γραφικού περιβάλλοντος της σελίδας αυτής. (Η 5000 χρησιμοποιείται από το chatbot API. Η 8080 είναι για τα HTML αρχεία.)
+) που χρησιμοποιεί τη θύρα 8080 (port 8080) και εξυπηρετεί αρχεία από τον φάκελο όπου τρέχουμε την εντολή. Μπορούμε μετά να ανοίξουμε σε ένα browser το αρχείο <a href=chatbot_with_memory.html>chatbot_with_memory.html</a> (http://localhost:8080/chatbot_with_memory.html στον browser) ώστε να κάνουμε αιτήματα στο API μέσω του γραφικού περιβάλλοντος της σελίδας αυτής. (Η 5000 χρησιμοποιείται από το chatbot API. Η 8080 είναι για τα HTML αρχεία.)
 
 
 <hr>
