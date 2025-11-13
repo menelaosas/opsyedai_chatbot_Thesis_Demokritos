@@ -398,6 +398,3 @@ pdf_index, pdf_model, _ = build_pdf_sklearn_index(chunks, pdf_model_name)
   Αυτός ο φάκελος περιέχει τα ερωτηματολόγια από την έρευνα στο προσωπικό του help desk
   </div>
 </details>
-
-
-/
