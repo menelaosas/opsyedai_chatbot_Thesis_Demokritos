@@ -389,3 +389,15 @@ pdf_index, pdf_model, _ = build_pdf_sklearn_index(chunks, pdf_model_name)
   Αυτός ο φάκελος χρησιμοποιείται για να αποθηκεύονται τα αποτελέσματα των evaluation των μοντέλων
   </div>
 </details>
+
+<hr>
+
+<details>
+  <summary><strong style="font-size: 2em;">📁 <a href="results">Questionnaire Research_of Help Desk</a></strong></summary>
+  <div style="margin-left: 20px;">
+  Αυτός ο φάκελος περιέχει τα ερωτηματολόγια από την έρευνα στο προσωπικό του help desk
+  </div>
+</details>
+
+
+/
